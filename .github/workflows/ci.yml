@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: Run Tests
+    name:  Run Tests
     runs-on: ubuntu-latest
 
     services:
@@ -27,19 +27,25 @@ jobs:
           --health-retries 5
 
     steps:
-      - name: Checkout code
+      - name:  Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name:  Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: Install dependencies
+      - name:  Install dependencies
         run: npm ci
 
-      - name: Run linter (if you have ESLint)
+      - name:  Create database tables
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -d tasks_db -f src/db/migrations.sql
+        env:
+          PGPASSWORD: postgres
+
+      - name:  Run linter (if you have ESLint)
         run: npm run lint || echo "No linter configured"
 
       - name: Run tests
@@ -53,25 +59,25 @@ jobs:
           JWT_SECRET: test_secret_key
 
   docker:
-    name: Build and Push Docker Image
+    name:  Build and Push Docker Image
     runs-on: ubuntu-latest
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      - name: Checkout code
+      - name:  Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
+      - name:  Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
+      - name:  Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: uild and push
+      - name:  Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
