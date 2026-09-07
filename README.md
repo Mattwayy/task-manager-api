@@ -17,7 +17,7 @@ REST API для управления задачами с JWT-авторизац�
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/yourusername/task-manager-api.git
+git clone https://github.com/Mattwayy/task-manager-api.git
 cd task-manager-api
 
 # Запустить через Docker
