@@ -5,19 +5,18 @@ REST API для управления задачами с JWT-авторизац�
 ##  Технологии
 
 - Node.js + Express
-- TypeScript (опционально)
 - PostgreSQL
-- JWT (jsonwebtoken)
-- bcrypt (хеширование паролей)
-- Zod (валидация)
-- Swagger (OpenAPI документация)
-- Docker + Docker Compose
+- JWT 
+- bcrypt 
+- Zod 
+- Swagger 
+- Docker 
 - Vittest 
 ##  Запуск
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/yourusername/task-manager-api.git
+git clone https://github.com/Mattwayy/task-manager-api.git
 cd task-manager-api
 
 # Запустить через Docker
