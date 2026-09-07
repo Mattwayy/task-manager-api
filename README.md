@@ -5,13 +5,12 @@ REST API для управления задачами с JWT-авторизац�
 ##  Технологии
 
 - Node.js + Express
-- TypeScript (опционально)
 - PostgreSQL
-- JWT (jsonwebtoken)
-- bcrypt (хеширование паролей)
-- Zod (валидация)
-- Swagger (OpenAPI документация)
-- Docker + Docker Compose
+- JWT 
+- bcrypt 
+- Zod 
+- Swagger 
+- Docker 
 - Vittest 
 ##  Запуск
 
