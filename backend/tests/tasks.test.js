@@ -7,23 +7,29 @@ describe('Tasks API (Protected Routes)', () => {
   let token;
 
   beforeAll(async () => {
-    await pool.query('DELETE FROM tasks');
-    await pool.query('DELETE FROM users');
-    await pool.query('ALTER SEQUENCE users_id_seq RESTART WITH 1');
+  await pool.query('DELETE FROM tasks');
+  await pool.query('DELETE FROM users');
+  await pool.query('ALTER SEQUENCE users_id_seq RESTART WITH 1');
 
-    await request(app).post('/api/auth/register').send({
-      username: 'taskuser',
-      email: 'task@example.com',
-      password: '123456',
-    });
-
-    const loginRes = await request(app).post('/api/auth/login').send({
-      email: 'task@example.com',
-      password: '123456',
-    });
-
-    token = loginRes.body.token;
+  // Ensure user is created and get their ID
+  const registerRes = await request(app).post('/api/auth/register').send({
+    username: 'taskuser',
+    email: 'task@example.com',
+    password: '123456',
   });
+
+  // Verify registration was successful
+  if (registerRes.status !== 201) {
+    throw new Error('User registration failed in test setup');
+  }
+
+  const loginRes = await request(app).post('/api/auth/login').send({
+    email: 'task@example.com',
+    password: '123456',
+  });
+
+  token = loginRes.body.token;
+});
 
   afterAll(async () => {
     await pool.query('DELETE FROM users');
