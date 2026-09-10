@@ -1,0 +1,16 @@
+# Node
+**/node_modules/
+**/.bin/
+**/dist/
+**/build/
+
+# Env
+**/.env
+**/.env.local
+
+# Логи
+**/*.log
+
+# Системные
+.DS_Store
+*.swp
