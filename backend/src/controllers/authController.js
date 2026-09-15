@@ -20,10 +20,6 @@ export const register = async (req, res) => {
       user: result.rows[0]
     });
       
-    res.status(201).json({ 
-      message: 'User registered successfully!',
-      user: result.rows[0]
-    });
   } catch (error) {
     // Handle unique constraint violations
     if (error.code === '23505') { // PostgreSQL unique violation code
