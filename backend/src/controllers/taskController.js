@@ -58,9 +58,10 @@ export const updateTask = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const existingTask = await checkTaskOwnership(id, userId);
-    if (!existingTask) {
-      return res.status(404).json({ error: 'Task not found' });
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ 
+        error: 'Request body cannot be empty.' 
+      });
     }
 
     const { title, description, status } = req.body;
@@ -76,6 +77,10 @@ export const updateTask = async (req, res) => {
       [title, description, status, id, userId]
     );
 
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
     res.json(result.rows[0]);
   } catch (error) {
     console.error(error);
@@ -88,12 +93,14 @@ export const deleteTask = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.id;
 
-    const existingTask = await checkTaskOwnership(id, userId);
-    if (!existingTask) {
+    const result = await pool.query(
+      'DELETE FROM tasks WHERE id = $1 AND user_id = $2 RETURNING *',
+      [id, userId]
+    );
+
+    if (result.rowCount === 0) {
       return res.status(404).json({ error: 'Task not found' });
     }
-
-    await pool.query('DELETE FROM tasks WHERE id = $1 AND user_id = $2', [id, userId]);
 
     res.json({ message: 'Task deleted successfully' });
   } catch (error) {

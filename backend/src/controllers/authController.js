@@ -21,11 +21,10 @@ export const register = async (req, res) => {
     });
       
   } catch (error) {
-    // Handle unique constraint violations
-    if (error.code === '23505') { // PostgreSQL unique violation code
+    if (error.code === '23505') { 
       return res.status(409).json({ error: 'Username or email already exists' });
     }
-    res.status(500)
+    res.status(500).json({ error: 'Internal server error' })
   }
 };
 
