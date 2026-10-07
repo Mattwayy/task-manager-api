@@ -12,6 +12,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
