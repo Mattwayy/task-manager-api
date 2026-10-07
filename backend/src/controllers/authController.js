@@ -1,30 +1,27 @@
 import pool from '../db.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkey123';
-// In your auth controller
+
 export const register = async (req, res) => {
   try {
-        const { username, email, password } = req.body;
-
+    const { username, email, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const result = await pool.query(
       'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username, email',
       [username, email, hashedPassword]
     );
-
     res.status(201).json({
       message: 'User registered successfully!',
       user: result.rows[0]
     });
-      
   } catch (error) {
-    if (error.code === '23505') { 
+    console.error(error);
+    if (error.code === '23505') {
       return res.status(409).json({ error: 'Username or email already exists' });
     }
-    res.status(500).json({ error: 'Internal server error' })
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
@@ -59,7 +56,6 @@ export const login = async (req, res) => {
         email: user.email
       }
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal server error' });

@@ -1,48 +1,32 @@
-# Task Manager API
-
-REST API для управления задачами с JWT-авторизацией.
+# Task Manager — Fullstack App
 
 ![CI/CD](https://github.com/Mattwayy/task-manager-api/actions/workflows/ci.yml/badge.svg)
 
-##  Технологии
+Fullstack-приложение для управления задачами с JWT-авторизацией.
 
+##  Стек
+
+**Backend:**
 - Node.js + Express
 - PostgreSQL
-- JWT (jsonwebtoken)
-- bcrypt (хеширование паролей)
+- JWT + bcryptjs
 - Zod (валидация)
-- Swagger (OpenAPI документация)
-- Docker + Docker Compose
-- Vitest (тесты)
+- Swagger (документация)
 
-##  Запуск
+**Frontend:**
+- React + Vite
+- react-router-dom
+- openapi-fetch (типизированный клиент)
 
-### Через Docker (рекомендуется)
+**DevOps:**
+- Docker Compose
+- GitHub Actions (CI/CD)
+
+
+
+## Запуск
 
 ```bash
 git clone https://github.com/Mattwayy/task-manager-api.git
-cd task-manager-api/backend
+cd task-manager-api
 docker compose up -d
-
-Сервер: http://localhost:3000
-Swagger: http://localhost:3000/api-docs
-
-
-# 1. Поднять БД
-cd backend
-docker compose up -d postgres
-
-# 2. Установить зависимости
-npm install
-
-# 3. Настроить .env (см. .env.example)
-
-# 4. Накатить миграции
-npm run migrate
-
-# 5. Запустить
-npm run dev
-
-# Важно про миграции
-Файл migrations.sql использует DROP TABLE IF EXISTS ... CASCADE — это деструктивная миграция.
-Она удаляет все данные при каждом запуске.
