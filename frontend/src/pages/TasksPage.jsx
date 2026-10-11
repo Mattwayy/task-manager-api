@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTasks, createTask, deleteTask, updateTask } from '../api/tasks';
 import { logoutUser } from '../api/auth';
@@ -10,7 +10,7 @@ export default function TasksPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-const loadTasks = async () => {
+const loadTasks = useCallback(async () => {
   setLoading(true);
   setError('');
   try {
@@ -18,18 +18,18 @@ const loadTasks = async () => {
     setTasks(data || []);
   } catch (err) {
     setError(err.message);
-    if (err.message.toLowerCase().includes('token') || err.message.toLowerCase().includes('unauthorized')) {
+    if (err.status === 401) {
       logoutUser();
       navigate('/login');
     }
   } finally {
     setLoading(false);
   }
-};
+}, [navigate]);
   useEffect(() => {
     loadTasks();
-  }, []);
-
+  }, [loadTasks]);
+}
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;

@@ -6,6 +6,14 @@ type ApiError = {
 };
 type TaskStatus = 'pending' | 'in_progress' | 'completed';
 
+export class ApiRequestError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 const parseError = (error: unknown, fallback: string): string => {
   if (!error) return fallback;
   const err = error as ApiError;
@@ -17,8 +25,8 @@ const parseError = (error: unknown, fallback: string): string => {
 };
 
 export const getTasks = async () => {
-  const { data, error } = await client.GET('/api/tasks');
-  if (error) throw new Error(parseError(error, 'Failed to fetch tasks'));
+  const { data, error, response } = await client.GET('/api/tasks');
+  if (error) throw new ApiRequestError(parseError(error, 'Failed to fetch tasks'), response.status);
   return data;
 };
 
@@ -27,10 +35,10 @@ export const createTask = async (data: {
   description?: string;
   status?: TaskStatus;
 }) => {
-  const { data: response, error } = await client.POST('/api/tasks', {
+  const { data: response, error, response: rawResponse } = await client.POST('/api/tasks', {
     body: data as any,
   });
-  if (error) throw new Error(parseError(error, 'Failed to create task'));
+  if (error) throw new ApiRequestError(parseError(error, 'Failed to create task'), rawResponse.status);
   return response;
 };
 
@@ -38,17 +46,17 @@ export const updateTask = async (
   id: number,
   data: { title?: string; description?: string; status?: TaskStatus }
 ) => {
-  const { data: response, error } = await client.PUT('/api/tasks/{id}', {
+  const { data: response, error, response: rawResponse } = await client.PUT('/api/tasks/{id}', {
     params: { path: { id } },
     body: data as any,
   });
-  if (error) throw new Error(parseError(error, 'Failed to update task'));
+  if (error) throw new ApiRequestError(parseError(error, 'Failed to update task'), rawResponse.status);
   return response;
 };
 
 export const deleteTask = async (id: number) => {
-  const { error } = await client.DELETE('/api/tasks/{id}', {
+  const { error, response } = await client.DELETE('/api/tasks/{id}', {
     params: { path: { id } },
   });
-  if (error) throw new Error(parseError(error, 'Failed to delete task'));
+  if (error) throw new ApiRequestError(parseError(error, 'Failed to delete task'), response.status);
 };

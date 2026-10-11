@@ -13,6 +13,7 @@ import {
 const router = express.Router();
 
 router.use(authMiddleware);
+
 /**
  * @swagger
  * /api/tasks:
@@ -25,7 +26,8 @@ router.use(authMiddleware);
  *       200:
  *         description: List of tasks
  */
-router.get('/:id', validate(taskIdSchema, 'params'), getTaskById);
+router.get('/', getTasks);
+
 /**
  * @swagger
  * /api/tasks/{id}:
@@ -46,6 +48,7 @@ router.get('/:id', validate(taskIdSchema, 'params'), getTaskById);
  *       404:
  *         description: Not found
  */
+router.get('/:id', validate(taskIdSchema, 'params'), getTaskById);
 
 /**
  * @swagger
@@ -109,6 +112,7 @@ router.post('/', validate(createTaskSchema), createTask);
  *         description: Task updated
  */
 router.put('/:id', validate(updateTaskSchema, 'body'), validate(taskIdSchema, 'params'), updateTask);
+
 /**
  * @swagger
  * /api/tasks/{id}:

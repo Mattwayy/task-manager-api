@@ -7,7 +7,6 @@ import taskRoutes from './routes/taskRoutes.js';
 import authMiddleware from './middleware/auth.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
@@ -25,11 +24,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {
   res.json({ status: 'OK', message: 'Task Manager API is running!' });
-});
-
-app.use('/api/auth', (req, res, next) => {
-  console.log('🔥 AUTH REQUEST:', req.method, req.originalUrl);
-  next();
 });
 
 app.use('/api/auth', authRoutes);

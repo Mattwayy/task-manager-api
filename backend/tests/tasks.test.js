@@ -43,6 +43,13 @@ describe('Tasks API (Protected Routes)', () => {
       .send({ title: 'User A Task' });
     taskIdA = taskRes.body.id;
   });
+it('should return only own tasks', async () => {
+  const res = await request(app)
+    .get('/api/tasks')
+    .set('Authorization', `Bearer ${tokenB}`);
+  expect(res.status).toBe(200);
+  expect(res.body).toEqual([]);
+});
 
   afterAll(async () => {
     await pool.query('DELETE FROM tasks');

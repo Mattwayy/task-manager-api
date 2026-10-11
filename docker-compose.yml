@@ -28,7 +28,6 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=tasks_db
-      - JWT_SECRET=supersecret123
     volumes:
       - ./backend:/app
       - /app/node_modules
