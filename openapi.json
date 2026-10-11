@@ -1,1 +1,869 @@
-{"openapi":"3.0.0","info":{"title":"Task Manager API","version":"1.0.0","description":"REST API for task management with JWT authentication"},"servers":[{"url":"http://localhost:3000","description":"Development server"}],"components":{"securitySchemes":{"bearerAuth":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}},"schemas":{"User":{"type":"object","properties":{"id":{"type":"integer"},"username":{"type":"string"},"email":{"type":"string"},"created_at":{"type":"string","format":"date-time"}}},"Task":{"type":"object","properties":{"id":{"type":"integer"},"title":{"type":"string"},"description":{"type":"string"},"status":{"type":"string","enum":["pending","in_progress","completed"]},"user_id":{"type":"integer"},"created_at":{"type":"string","format":"date-time"},"updated_at":{"type":"string","format":"date-time"}}},"ValidationError":{"type":"object","properties":{"errors":{"type":"array","items":{"type":"object","properties":{"field":{"type":"string"},"message":{"type":"string"}}}}}}}},"security":[{"bearerAuth":[]}],"paths":{"/api/tasks":{"get":{"summary":"Get all tasks for authenticated user","tags":["Tasks"],"security":[{"bearerAuth":[]}],"responses":{"200":{"description":"List of tasks"}}},"post":{"summary":"Create a new task","tags":["Tasks"],"security":[{"bearerAuth":[]}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["title"],"properties":{"title":{"type":"string"},"description":{"type":"string"},"status":{"type":"string","enum":["pending","in_progress","completed"]}}}}}},"responses":{"201":{"description":"Task created"}}}},"/api/tasks/{id}":{"get":{"summary":"Get task by ID","tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"id","required":true,"schema":{"type":"integer"}}],"responses":{"200":{"description":"Task found"},"404":{"description":"Not found"}}},"put":{"summary":"Update a task","tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"id","required":true,"schema":{"type":"integer"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","properties":{"title":{"type":"string"},"description":{"type":"string"},"status":{"type":"string","enum":["pending","in_progress","completed"]}}}}}},"responses":{"200":{"description":"Task updated"}}},"delete":{"summary":"Delete a task","tags":["Tasks"],"security":[{"bearerAuth":[]}],"parameters":[{"in":"path","name":"id","required":true,"schema":{"type":"integer"}}],"responses":{"200":{"description":"Task deleted"}}}},"/api/auth/register":{"post":{"summary":"Register a new user","tags":["Auth"],"requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["username","email","password"],"properties":{"username":{"type":"string","minLength":3},"email":{"type":"string","format":"email"},"password":{"type":"string","minLength":6}}}}}},"responses":{"201":{"description":"User registered"},"400":{"description":"Validation error"},"409":{"description":"Username or email already exists"}}}},"/api/auth/login":{"post":{"summary":"Login user and get JWT token","tags":["Auth"],"requestBody":{"required":true,"content":{"application/json":{"schema":{"type":"object","required":["email","password"],"properties":{"email":{"type":"string","format":"email"},"password":{"type":"string"}}}}}},"responses":{"200":{"description":"Login successful"},"401":{"description":"Invalid credentials"}}}}},"tags":[]}
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Task Manager API",
+    "version": "1.0.0",
+    "description": "REST API for task management with JWT authentication.\n\n**Authentication.** Register, then log in to get a JWT (valid for 7 days). Send it in the `Authorization: Bearer <token>` header to every protected endpoint.\n\n**Data isolation.** Every user sees and changes only their own tasks. Requests for someone else's task return `404`, not `403`.\n\n**Errors.** Two shapes are used: `{ \"error\": \"message\" }` for single errors and `{ \"errors\": [{ \"field\", \"message\" }] }` for request validation (`400`)."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Registration and login"
+    },
+    {
+      "name": "Tasks",
+      "description": "CRUD for the authenticated user's tasks"
+    },
+    {
+      "name": "System",
+      "description": "Service endpoints"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "operationId": "healthCheck",
+        "summary": "Health check",
+        "description": "Returns a static status message. Useful as a liveness probe.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                },
+                "example": {
+                  "status": "OK",
+                  "message": "Task Manager API is running!"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "registerUser",
+        "summary": "Register a new user",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "example": {
+                "username": "alice",
+                "email": "alice@example.com",
+                "password": "secret123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                },
+                "example": {
+                  "message": "User registered successfully!",
+                  "user": {
+                    "id": 1,
+                    "username": "alice",
+                    "email": "alice@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "loginUser",
+        "summary": "Log in and get a JWT",
+        "description": "The token payload contains `id` and `email` and expires in 7 days.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "example": {
+                "email": "alice@example.com",
+                "password": "secret123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "example": {
+                  "message": "Login successful",
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "user": {
+                    "id": 1,
+                    "username": "alice",
+                    "email": "alice@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "description": "Wrong email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "error": "Invalid credentials"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "getProfile",
+        "summary": "Get the current token payload",
+        "description": "Protected endpoint that echoes the decoded JWT. Handy for checking a token.",
+        "responses": {
+          "200": {
+            "description": "Decoded token payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                },
+                "example": {
+                  "message": "You have accessed protected data!",
+                  "user": {
+                    "id": 1,
+                    "email": "alice@example.com",
+                    "iat": 1791733716,
+                    "exp": 1792338516
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/tasks": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "listTasks",
+        "summary": "List the current user's tasks",
+        "description": "Returns only the authenticated user's tasks, newest first.",
+        "responses": {
+          "200": {
+            "description": "Array of tasks (empty if the user has none)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Task"
+                  }
+                },
+                "example": [
+                  {
+                    "id": 1,
+                    "title": "Write README",
+                    "description": "Describe the project and how to run it",
+                    "status": "pending",
+                    "user_id": 1,
+                    "created_at": "2026-10-11T15:48:36.596Z",
+                    "updated_at": "2026-10-11T15:48:36.596Z"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "createTask",
+        "summary": "Create a task",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskRequest"
+              },
+              "example": {
+                "title": "Write README",
+                "description": "Describe the project",
+                "status": "pending"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Task created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Write README",
+                  "description": "Describe the project and how to run it",
+                  "status": "pending",
+                  "user_id": 1,
+                  "created_at": "2026-10-11T15:48:36.596Z",
+                  "updated_at": "2026-10-11T15:48:36.596Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    },
+    "/api/tasks/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Task ID (positive integer).",
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "getTask",
+        "summary": "Get a task by ID",
+        "responses": {
+          "200": {
+            "description": "Task found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Write README",
+                  "description": "Describe the project and how to run it",
+                  "status": "pending",
+                  "user_id": 1,
+                  "created_at": "2026-10-11T15:48:36.596Z",
+                  "updated_at": "2026-10-11T15:48:36.596Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "updateTask",
+        "summary": "Update a task",
+        "description": "Partial update: send only the fields to change. An empty body returns `400` with `{ \"error\": \"Request body cannot be empty.\" }`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskRequest"
+              },
+              "example": {
+                "status": "completed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Task"
+                },
+                "example": {
+                  "id": 1,
+                  "title": "Write README",
+                  "description": "Describe the project and how to run it",
+                  "status": "completed",
+                  "user_id": 1,
+                  "created_at": "2026-10-11T15:48:36.596Z",
+                  "updated_at": "2026-10-11T16:00:00.000Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, or the request body is empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ValidationError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ]
+                },
+                "examples": {
+                  "validation": {
+                    "summary": "Invalid field",
+                    "value": {
+                      "errors": [
+                        {
+                          "field": "status",
+                          "message": "Invalid option: expected one of \"pending\"|\"in_progress\"|\"completed\""
+                        }
+                      ]
+                    }
+                  },
+                  "emptyBody": {
+                    "summary": "Empty body",
+                    "value": {
+                      "error": "Request body cannot be empty."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tasks"
+        ],
+        "operationId": "deleteTask",
+        "summary": "Delete a task",
+        "responses": {
+          "200": {
+            "description": "Task deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "Task deleted successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/ServerError"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT from `POST /api/auth/login`. Send as `Authorization: Bearer <token>`."
+      }
+    },
+    "schemas": {
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "alice"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alice@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 6,
+            "format": "password",
+            "example": "secret123"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alice@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 1,
+            "format": "password",
+            "example": "secret123"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "alice"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "alice@example.com"
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "user"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User registered successfully!"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "token",
+          "user"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT, valid for 7 days"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "user"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "user": {
+            "type": "object",
+            "required": [
+              "id",
+              "email",
+              "iat",
+              "exp"
+            ],
+            "description": "Decoded JWT payload",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "iat": {
+                "type": "integer",
+                "description": "Issued at (Unix time, seconds)"
+              },
+              "exp": {
+                "type": "integer",
+                "description": "Expires at (Unix time, seconds)"
+              }
+            }
+          }
+        }
+      },
+      "Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "status",
+          "user_id",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Write README"
+          },
+          "description": {
+            "type": "string",
+            "example": "Describe the project"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          },
+          "user_id": {
+            "type": "integer",
+            "description": "Owner of the task",
+            "example": 1
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TaskStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "in_progress",
+          "completed"
+        ]
+      },
+      "CreateTaskRequest": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string",
+            "default": ""
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus",
+            "default": "pending"
+          }
+        }
+      },
+      "UpdateTaskRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "description": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TaskStatus"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string"
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": [
+          "errors"
+        ],
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "field",
+                "message"
+              ],
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "example": "email"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Invalid email format"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "responses": {
+      "ValidationFailed": {
+        "description": "Request validation failed",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "example": {
+              "errors": [
+                {
+                  "field": "email",
+                  "message": "Invalid email format"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing, malformed, invalid or expired token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "No token provided"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Task not found (or it belongs to another user)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "Task not found"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Username or email already exists",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "Username or email already exists"
+            }
+          }
+        }
+      },
+      "ServerError": {
+        "description": "Unexpected server error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "example": {
+              "error": "Internal server error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -25,5 +25,5 @@ export const updateTaskSchema = z.object({
     .optional()
 });
 export const taskIdSchema = z.object({
-  id: z.coerce.number().int().positive(),
+  id: z.coerce.number().int().positive().max(2147483647),
 });

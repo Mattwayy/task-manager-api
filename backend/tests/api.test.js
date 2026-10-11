@@ -5,8 +5,8 @@ import pool from '../src/db.js';
 
 describe('API Integration Tests', () => {
 beforeEach(async () => {
-  await pool.query('DELETE FROM tasks');   // ← сначала задачи
-  await pool.query('DELETE FROM users');   // ← потом пользователи
+  await pool.query('DELETE FROM tasks'); 
+  await pool.query('DELETE FROM users');   
   await pool.query('ALTER SEQUENCE users_id_seq RESTART WITH 1');
 });
 

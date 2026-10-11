@@ -4,154 +4,21 @@
  */
 
 export interface paths {
-    "/api/tasks": {
+    "/": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get all tasks for authenticated user */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description List of tasks */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /**
+         * Health check
+         * @description Returns a static status message. Useful as a liveness probe.
+         */
+        get: operations["healthCheck"];
         put?: never;
-        /** Create a new task */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        title: string;
-                        description?: string;
-                        /** @enum {string} */
-                        status?: "pending" | "in_progress" | "completed";
-                    };
-                };
-            };
-            responses: {
-                /** @description Task created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/tasks/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get task by ID */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Task found */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Not found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        /** Update a task */
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        title?: string;
-                        description?: string;
-                        /** @enum {string} */
-                        status?: "pending" | "in_progress" | "completed";
-                    };
-                };
-            };
-            responses: {
-                /** @description Task updated */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
         post?: never;
-        /** Delete a task */
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Task deleted */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -167,47 +34,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register a new user */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        username: string;
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description User registered */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Validation error */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Username or email already exists */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        post: operations["registerUser"];
         delete?: never;
         options?: never;
         head?: never;
@@ -223,41 +50,81 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Login user and get JWT token */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": {
-                        /** Format: email */
-                        email: string;
-                        password: string;
-                    };
-                };
-            };
-            responses: {
-                /** @description Login successful */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Invalid credentials */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
+        /**
+         * Log in and get a JWT
+         * @description The token payload contains `id` and `email` and expires in 7 days.
+         */
+        post: operations["loginUser"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the current token payload
+         * @description Protected endpoint that echoes the decoded JWT. Handy for checking a token.
+         */
+        get: operations["getProfile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tasks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the current user's tasks
+         * @description Returns only the authenticated user's tasks, newest first.
+         */
+        get: operations["listTasks"];
+        put?: never;
+        /** Create a task */
+        post: operations["createTask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Task ID (positive integer).
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        /** Get a task by ID */
+        get: operations["getTask"];
+        /**
+         * Update a task
+         * @description Partial update: send only the fields to change. An empty body returns `400` with `{ "error": "Request body cannot be empty." }`.
+         */
+        put: operations["updateTask"];
+        post?: never;
+        /** Delete a task */
+        delete: operations["deleteTask"];
         options?: never;
         head?: never;
         patch?: never;
@@ -267,37 +134,574 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        RegisterRequest: {
+            /** @example alice */
+            username: string;
+            /**
+             * Format: email
+             * @example alice@example.com
+             */
+            email: string;
+            /**
+             * Format: password
+             * @example secret123
+             */
+            password: string;
+        };
+        LoginRequest: {
+            /**
+             * Format: email
+             * @example alice@example.com
+             */
+            email: string;
+            /**
+             * Format: password
+             * @example secret123
+             */
+            password: string;
+        };
         User: {
-            id?: number;
-            username?: string;
-            email?: string;
-            /** Format: date-time */
-            created_at?: string;
+            /** @example 1 */
+            id: number;
+            /** @example alice */
+            username: string;
+            /**
+             * Format: email
+             * @example alice@example.com
+             */
+            email: string;
+        };
+        RegisterResponse: {
+            /** @example User registered successfully! */
+            message: string;
+            user: components["schemas"]["User"];
+        };
+        LoginResponse: {
+            /** @example Login successful */
+            message: string;
+            /** @description JWT, valid for 7 days */
+            token: string;
+            user: components["schemas"]["User"];
+        };
+        ProfileResponse: {
+            message: string;
+            /** @description Decoded JWT payload */
+            user: {
+                id: number;
+                /** Format: email */
+                email: string;
+                /** @description Issued at (Unix time, seconds) */
+                iat: number;
+                /** @description Expires at (Unix time, seconds) */
+                exp: number;
+            };
         };
         Task: {
-            id?: number;
+            /** @example 1 */
+            id: number;
+            /** @example Write README */
+            title: string;
+            /** @example Describe the project */
+            description: string;
+            status: components["schemas"]["TaskStatus"];
+            /**
+             * @description Owner of the task
+             * @example 1
+             */
+            user_id: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        /** @enum {string} */
+        TaskStatus: "pending" | "in_progress" | "completed";
+        CreateTaskRequest: {
+            title: string;
+            /** @default  */
+            description: string;
+            /** @default pending */
+            status: components["schemas"]["TaskStatus"];
+        };
+        UpdateTaskRequest: {
             title?: string;
             description?: string;
-            /** @enum {string} */
-            status?: "pending" | "in_progress" | "completed";
-            user_id?: number;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
+            status?: components["schemas"]["TaskStatus"];
+        };
+        HealthResponse: {
+            status: string;
+            message: string;
+        };
+        MessageResponse: {
+            message: string;
+        };
+        Error: {
+            error: string;
         };
         ValidationError: {
-            errors?: {
-                field?: string;
-                message?: string;
+            errors: {
+                /** @example email */
+                field: string;
+                /** @example Invalid email format */
+                message: string;
             }[];
         };
     };
-    responses: never;
+    responses: {
+        /** @description Request validation failed */
+        ValidationFailed: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "errors": [
+                 *         {
+                 *           "field": "email",
+                 *           "message": "Invalid email format"
+                 *         }
+                 *       ]
+                 *     }
+                 */
+                "application/json": components["schemas"]["ValidationError"];
+            };
+        };
+        /** @description Missing, malformed, invalid or expired token */
+        Unauthorized: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "error": "No token provided"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Task not found (or it belongs to another user) */
+        NotFound: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "error": "Task not found"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Username or email already exists */
+        Conflict: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "error": "Username or email already exists"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+        /** @description Unexpected server error */
+        ServerError: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "error": "Internal server error"
+                 *     }
+                 */
+                "application/json": components["schemas"]["Error"];
+            };
+        };
+    };
     parameters: never;
     requestBodies: never;
     headers: never;
     pathItems: never;
 }
 export type $defs = Record<string, never>;
-export type operations = Record<string, never>;
+export interface operations {
+    healthCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service is running */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "status": "OK",
+                     *       "message": "Task Manager API is running!"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["HealthResponse"];
+                };
+            };
+        };
+    };
+    registerUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "username": "alice",
+                 *       "email": "alice@example.com",
+                 *       "password": "secret123"
+                 *     }
+                 */
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description User registered */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "User registered successfully!",
+                     *       "user": {
+                     *         "id": 1,
+                     *         "username": "alice",
+                     *         "email": "alice@example.com"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["RegisterResponse"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    loginUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "email": "alice@example.com",
+                 *       "password": "secret123"
+                 *     }
+                 */
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description Login successful */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Login successful",
+                     *       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                     *       "user": {
+                     *         "id": 1,
+                     *         "username": "alice",
+                     *         "email": "alice@example.com"
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["LoginResponse"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            /** @description Wrong email or password */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "error": "Invalid credentials"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Decoded token payload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "You have accessed protected data!",
+                     *       "user": {
+                     *         "id": 1,
+                     *         "email": "alice@example.com",
+                     *         "iat": 1791733716,
+                     *         "exp": 1792338516
+                     *       }
+                     *     }
+                     */
+                    "application/json": components["schemas"]["ProfileResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+        };
+    };
+    listTasks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Array of tasks (empty if the user has none) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example [
+                     *       {
+                     *         "id": 1,
+                     *         "title": "Write README",
+                     *         "description": "Describe the project and how to run it",
+                     *         "status": "pending",
+                     *         "user_id": 1,
+                     *         "created_at": "2026-10-11T15:48:36.596Z",
+                     *         "updated_at": "2026-10-11T15:48:36.596Z"
+                     *       }
+                     *     ]
+                     */
+                    "application/json": components["schemas"]["Task"][];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    createTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "title": "Write README",
+                 *       "description": "Describe the project",
+                 *       "status": "pending"
+                 *     }
+                 */
+                "application/json": components["schemas"]["CreateTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description Task created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": 1,
+                     *       "title": "Write README",
+                     *       "description": "Describe the project and how to run it",
+                     *       "status": "pending",
+                     *       "user_id": 1,
+                     *       "created_at": "2026-10-11T15:48:36.596Z",
+                     *       "updated_at": "2026-10-11T15:48:36.596Z"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthorized"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Task ID (positive integer).
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Task found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": 1,
+                     *       "title": "Write README",
+                     *       "description": "Describe the project and how to run it",
+                     *       "status": "pending",
+                     *       "user_id": 1,
+                     *       "created_at": "2026-10-11T15:48:36.596Z",
+                     *       "updated_at": "2026-10-11T15:48:36.596Z"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    updateTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Task ID (positive integer).
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                /**
+                 * @example {
+                 *       "status": "completed"
+                 *     }
+                 */
+                "application/json": components["schemas"]["UpdateTaskRequest"];
+            };
+        };
+        responses: {
+            /** @description Task updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "id": 1,
+                     *       "title": "Write README",
+                     *       "description": "Describe the project and how to run it",
+                     *       "status": "completed",
+                     *       "user_id": 1,
+                     *       "created_at": "2026-10-11T15:48:36.596Z",
+                     *       "updated_at": "2026-10-11T16:00:00.000Z"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["Task"];
+                };
+            };
+            /** @description Validation failed, or the request body is empty */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationError"] | components["schemas"]["Error"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    deleteTask: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /**
+                 * @description Task ID (positive integer).
+                 * @example 1
+                 */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Task deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "message": "Task deleted successfully"
+                     *     }
+                     */
+                    "application/json": components["schemas"]["MessageResponse"];
+                };
+            };
+            400: components["responses"]["ValidationFailed"];
+            401: components["responses"]["Unauthorized"];
+            404: components["responses"]["NotFound"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+}
