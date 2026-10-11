@@ -4,14 +4,14 @@
 
 Fullstack-приложение для управления задачами с JWT-авторизацией.
 
-##  Стек
+## 🚀 Стек
 
 **Backend:**
 - Node.js + Express
 - PostgreSQL
-- JWT + bcryptjs
+- JWT (jsonwebtoken) + bcryptjs
 - Zod (валидация)
-- Swagger (документация)
+- Swagger (OpenAPI документация)
 
 **Frontend:**
 - React + Vite
@@ -21,10 +21,18 @@ Fullstack-приложение для управления задачами с J
 **DevOps:**
 - Docker Compose
 - GitHub Actions (CI/CD)
+- Vitest + Supertest (тесты)
 
+## 📋 Функции
 
+- ✅ Регистрация и логин (JWT)
+- ✅ CRUD задач (создание, чтение, обновление, удаление)
+- ✅ Изоляция пользователей (каждый видит только свои задачи)
+- ✅ Swagger-документация API
+- ✅ Валидация данных (Zod)
+- ✅ Docker + CI/CD
 
-## Запуск
+## 🔥 Запуск
 
 ```bash
 git clone https://github.com/Mattwayy/task-manager-api.git
