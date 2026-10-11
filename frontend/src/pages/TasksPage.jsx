@@ -10,26 +10,27 @@ export default function TasksPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-const loadTasks = useCallback(async () => {
-  setLoading(true);
-  setError('');
-  try {
-    const data = await getTasks();
-    setTasks(data || []);
-  } catch (err) {
-    setError(err.message);
-    if (err.status === 401) {
-      logoutUser();
-      navigate('/login');
+  const loadTasks = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getTasks();
+      setTasks(data || []);
+    } catch (err) {
+      setError(err.message);
+      if (err.status === 401) {
+        logoutUser();
+        navigate('/login');
+      }
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
-  }
-}, [navigate]);
+  }, [navigate]);
+
   useEffect(() => {
     loadTasks();
   }, [loadTasks]);
-}
+
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -95,10 +96,12 @@ const loadTasks = useCallback(async () => {
               checked={task.status === 'completed'}
               onChange={() => handleToggle(task)}
             />
-            <span style={{
-              flex: 1,
-              textDecoration: task.status === 'completed' ? 'line-through' : 'none',
-            }}>
+            <span
+              style={{
+                flex: 1,
+                textDecoration: task.status === 'completed' ? 'line-through' : 'none',
+              }}
+            >
               {task.title}
             </span>
             <button onClick={() => handleDelete(task.id)} style={styles.deleteBtn}>×</button>
