@@ -1,21 +1,10 @@
 import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './swagger.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import authMiddleware from './middleware/auth.js';
-
-process.on('uncaughtException', (err) => {
-  console.error('💥 UNCAUGHT EXCEPTION:', err);
-});
-
-process.on('unhandledRejection', (reason) => {
-  console.error('💥 UNHANDLED REJECTION:', reason);
-});
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,7 +39,3 @@ app.get('/profile', authMiddleware, (req, res) => {
 app.use('/api/tasks', taskRoutes);
 
 export default app;
-
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});

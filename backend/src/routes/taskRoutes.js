@@ -1,7 +1,7 @@
 import express from 'express';
 import authMiddleware from '../middleware/auth.js';
 import validate from '../middleware/validate.js';
-import { createTaskSchema, updateTaskSchema } from '../schemas/taskSchemas.js';
+import { createTaskSchema, updateTaskSchema, taskIdSchema } from '../schemas/taskSchemas.js';
 import {
   getTasks,
   getTaskById,
@@ -13,7 +13,6 @@ import {
 const router = express.Router();
 
 router.use(authMiddleware);
-
 /**
  * @swagger
  * /api/tasks:
@@ -26,8 +25,7 @@ router.use(authMiddleware);
  *       200:
  *         description: List of tasks
  */
-router.get('/', getTasks);
-
+router.get('/:id', validate(taskIdSchema, 'params'), getTaskById);
 /**
  * @swagger
  * /api/tasks/{id}:
@@ -48,7 +46,6 @@ router.get('/', getTasks);
  *       404:
  *         description: Not found
  */
-router.get('/:id', getTaskById);
 
 /**
  * @swagger
@@ -111,8 +108,7 @@ router.post('/', validate(createTaskSchema), createTask);
  *       200:
  *         description: Task updated
  */
-router.put('/:id', validate(updateTaskSchema), updateTask);
-
+router.put('/:id', validate(updateTaskSchema, 'body'), validate(taskIdSchema, 'params'), updateTask);
 /**
  * @swagger
  * /api/tasks/{id}:
@@ -131,6 +127,6 @@ router.put('/:id', validate(updateTaskSchema), updateTask);
  *       200:
  *         description: Task deleted
  */
-router.delete('/:id', deleteTask);
+router.delete('/:id', validate(taskIdSchema, 'params'), deleteTask);
 
 export default router;

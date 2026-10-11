@@ -5,7 +5,8 @@ export default defineConfig({
     environment: 'node',
     globals: true,
     testTimeout: 10000,
-    fileParallelism: false,       // ← ВОТ ЭТО ГЛАВНОЕ
+    fileParallelism: false,
+    setupFiles: ['./tests/setup.js'],
     forceRerunTriggers: ['**/src/**'],
   },
 });

@@ -10,23 +10,22 @@ export default function TasksPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const loadTasks = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const data = await getTasks();
-      setTasks(data || []);
-    } catch (err) {
-      setError(err.message);
-      if (err.message?.includes('token')) {
-        logoutUser();
-        navigate('/login');
-      }
-    } finally {
-      setLoading(false);
+const loadTasks = async () => {
+  setLoading(true);
+  setError('');
+  try {
+    const data = await getTasks();
+    setTasks(data || []);
+  } catch (err) {
+    setError(err.message);
+    if (err.message.toLowerCase().includes('token') || err.message.toLowerCase().includes('unauthorized')) {
+      logoutUser();
+      navigate('/login');
     }
-  };
-
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     loadTasks();
   }, []);

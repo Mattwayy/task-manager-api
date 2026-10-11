@@ -24,3 +24,6 @@ export const updateTaskSchema = z.object({
   status: z.enum(taskStatuses)
     .optional()
 });
+export const taskIdSchema = z.object({
+  id: z.coerce.number().int().positive(),
+});
