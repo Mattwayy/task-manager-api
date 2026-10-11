@@ -28,9 +28,9 @@ export default function TasksPage() {
   }, [navigate]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadTasks();
   }, [loadTasks]);
-
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
