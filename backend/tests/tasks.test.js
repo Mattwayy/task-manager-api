@@ -50,6 +50,14 @@ it('should return only own tasks', async () => {
   expect(res.status).toBe(200);
   expect(res.body).toEqual([]);
 });
+it('should return own tasks for user A', async () => {
+  const res = await request(app)
+    .get('/api/tasks')
+    .set('Authorization', `Bearer ${tokenA}`);
+  expect(res.status).toBe(200);
+  expect(res.body.length).toBeGreaterThan(0);
+  expect(res.body[0]).toHaveProperty('title', 'User A Task');
+});
 
   afterAll(async () => {
     await pool.query('DELETE FROM tasks');

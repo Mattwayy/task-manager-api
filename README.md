@@ -37,4 +37,9 @@ Fullstack-приложение для управления задачами с J
 ```bash
 git clone https://github.com/Mattwayy/task-manager-api.git
 cd task-manager-api
+
+# Создай .env из шаблона
+cp .env.example .env
+
+# Подними всё
 docker compose up -d

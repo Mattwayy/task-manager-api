@@ -28,14 +28,14 @@ services:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_NAME=tasks_db
+      - JWT_SECRET=${JWT_SECRET:?Create .env from .env.example}
     volumes:
       - ./backend:/app
       - /app/node_modules
-    command: sh -c "npm run migrate && npm run dev"
+    command: sh -c "npm run migrate && npm start"
     depends_on:
       postgres:
         condition: service_healthy
-
   frontend:
     build: ./frontend
     working_dir: /app
