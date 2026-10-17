@@ -1,19 +1,18 @@
-# --- Builder ---
-FROM node:20-alpine AS builder
-
+# --- Dev ---
+FROM node:20-alpine AS dev
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
 
+# --- Prod ---
+FROM node:20-alpine AS prod
+WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
-
-# --- Production ---
-FROM node:20-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/node_modules ./node_modules
 COPY . .
-
+RUN npm run build
 EXPOSE 3000
-
-CMD ["node", "src/server.js"]
+CMD ["node", "dist/server.js"]

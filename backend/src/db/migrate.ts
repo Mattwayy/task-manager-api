@@ -7,7 +7,7 @@ import pool from '../db.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const migrate = async () => {
+const migrate = async (): Promise<void> => {
   try {
     console.log(`🔄 Running migrations on ${process.env.DB_NAME || 'tasks_db'}...`);
     const sql = fs.readFileSync(path.join(__dirname, 'migrations.sql'), 'utf8');

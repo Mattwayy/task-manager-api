@@ -1,4 +1,4 @@
-import express from 'express';
+import { Router } from 'express';
 import authMiddleware from '../middleware/auth.js';
 import validate from '../middleware/validate.js';
 import { createTaskSchema, updateTaskSchema, taskIdSchema } from '../schemas/taskSchemas.js';
@@ -10,7 +10,7 @@ import {
   deleteTask,
 } from '../controllers/taskController.js';
 
-const router = express.Router();
+const router = Router();
 
 router.use(authMiddleware);
 

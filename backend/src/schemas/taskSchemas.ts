@@ -1,6 +1,6 @@
-import z from 'zod';
+import { z } from 'zod';
 
-const taskStatuses = ['pending', 'in_progress', 'completed'];
+const taskStatuses = ['pending', 'in_progress', 'completed'] as const;
 
 export const createTaskSchema = z.object({
   title: z.string()
@@ -11,7 +11,7 @@ export const createTaskSchema = z.object({
     .default(''),
   status: z.enum(taskStatuses)
     .optional()
-    .default('pending')
+    .default('pending'),
 });
 
 export const updateTaskSchema = z.object({
@@ -22,8 +22,9 @@ export const updateTaskSchema = z.object({
   description: z.string()
     .optional(),
   status: z.enum(taskStatuses)
-    .optional()
+    .optional(),
 });
+
 export const taskIdSchema = z.object({
-  id: z.coerce.number().int().positive().max(2147483647),
+  id: z.coerce.number().int().positive(),
 });

@@ -1,9 +1,10 @@
-import express from 'express';
+import { Router } from 'express';
 import { register, login } from '../controllers/authController.js';
 import validate from '../middleware/validate.js';
 import { registerSchema, loginSchema } from '../schemas/authSchemas.js';
 
-const router = express.Router();
+const router = Router();
+
 
 /**
  * @swagger

@@ -17,7 +17,9 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      target: dev
     working_dir: /app
     ports:
       - "3000:3000"
@@ -30,9 +32,8 @@ services:
       - DB_NAME=tasks_db
       - JWT_SECRET=${JWT_SECRET:?Create .env from .env.example}
     volumes:
-      - ./backend:/app
-      - /app/node_modules
-    command: sh -c "npm run migrate && npm start"
+      - ./backend/src:/app/src # ← только src, не весь backend
+    command: sh -c "npm run migrate && DB_NAME=tasks_test npm run migrate && npm run dev"
     depends_on:
       postgres:
         condition: service_healthy
