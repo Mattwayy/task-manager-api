@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 export interface User {
   id: number;
   username: string;
