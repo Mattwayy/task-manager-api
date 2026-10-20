@@ -199,16 +199,16 @@ npx openapi-typescript ../openapi.json -o src/api.types.ts
 .
 ├── backend/
 │   ├── src/
-│   │   ├── server.js          # точка входа: dotenv, app.listen
-│   │   ├── app.js             # Express-приложение (без listen, удобно для тестов)
-│   │   ├── config.js          # обязательные переменные окружения
-│   │   ├── db.js              # пул соединений PostgreSQL
+│   │   ├── server.ts          # точка входа: dotenv, app.listen
+│   │   ├── app.ts             # Express-приложение (без listen, удобно для тестов)
+│   │   ├── config.ts          # обязательные переменные окружения
+│   │   ├── db.ts              # пул соединений PostgreSQL
 │   │   ├── db/                # migrate.js, reset.js и SQL-файлы
 │   │   ├── routes/            # маршруты и Swagger-аннотации
 │   │   ├── controllers/       # бизнес-логика
 │   │   ├── middleware/        # auth (JWT), validate (Zod)
 │   │   ├── schemas/           # Zod-схемы запросов
-│   │   └── swagger.js         # конфигурация Swagger UI
+│   │   └── swagger.ts         # конфигурация Swagger UI
 │   ├── tests/                 # интеграционные тесты и валидация схем
 │   └── docker/init-db.sh      # создаёт базу tasks_test при инициализации Postgres
 ├── frontend/

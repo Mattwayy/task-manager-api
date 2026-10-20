@@ -71,7 +71,8 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: [path.join(__dirname, 'routes/*.ts')],
+  const isDev = process.env.NODE_ENV === 'development';
+  apis: [path.join(__dirname, isDev ? 'routes/*.ts' : 'routes/*.js')],
 };
 
 export default swaggerJsdoc(options);

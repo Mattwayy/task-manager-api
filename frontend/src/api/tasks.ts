@@ -36,7 +36,7 @@ export const createTask = async (data: {
   status?: TaskStatus;
 }) => {
   const { data: response, error, response: rawResponse } = await client.POST('/api/tasks', {
-    body: data as any,
+    body: data as Task,
   });
   if (error) throw new ApiRequestError(parseError(error, 'Failed to create task'), rawResponse.status);
   return response;
@@ -48,7 +48,7 @@ export const updateTask = async (
 ) => {
   const { data: response, error, response: rawResponse } = await client.PUT('/api/tasks/{id}', {
     params: { path: { id } },
-    body: data as any,
+    body: data as Task,
   });
   if (error) throw new ApiRequestError(parseError(error, 'Failed to update task'), rawResponse.status);
   return response;

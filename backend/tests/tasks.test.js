@@ -8,9 +8,7 @@ describe('Tasks API (Protected Routes)', () => {
   let taskIdA;
 
   beforeAll(async () => {
-    await pool.query('DELETE FROM tasks');
-    await pool.query('DELETE FROM users');
-    await pool.query('ALTER SEQUENCE users_id_seq RESTART WITH 1');
+    await pool.query('TRUNCATE TABLE tasks, users RESTART IDENTITY CASCADE');
 
     // User A
     await request(app).post('/api/auth/register').send({

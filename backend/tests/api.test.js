@@ -5,9 +5,7 @@ import pool from '../src/db.js';
 
 describe('API Integration Tests', () => {
 beforeEach(async () => {
-  await pool.query('DELETE FROM tasks'); 
-  await pool.query('DELETE FROM users');   
-  await pool.query('ALTER SEQUENCE users_id_seq RESTART WITH 1');
+     await pool.query('TRUNCATE TABLE tasks, users RESTART IDENTITY CASCADE');
 });
 
   afterAll(async () => {

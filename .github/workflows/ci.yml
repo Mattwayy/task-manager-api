@@ -117,3 +117,24 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/task-manager-api:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # SMOKE-Test
+      - name: 🚀 Smoke test (Run container)
+        run: |
+          # run 
+          docker run -d --name test-api -p 3000:3000 \
+            -e DB_HOST=localhost \
+            -e DB_USER=postgres \
+            -e DB_PASSWORD=postgres \
+            -e DB_NAME=tasks_db \
+            -e JWT_SECRET=test_secret \
+            ${{ secrets.DOCKER_USERNAME }}/task-manager-api:latest
+          
+          echo "waiting to start server ..."
+          sleep 5
+          
+          # response check
+          echo "endpoint check /..."
+          curl --fail http://localhost:3000/ || (echo "SMOKE TEST FAILED" && docker logs test-api && exit 1)
+          
+          echo "✅ Smoke test passed!"
