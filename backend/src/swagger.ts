@@ -1,9 +1,11 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import swaggerJsdoc = require('swagger-jsdoc');
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const isDev = process.env.NODE_ENV === 'development';
 
 const options = {
   definition: {
@@ -71,7 +73,6 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  const isDev = process.env.NODE_ENV === 'development';
   apis: [path.join(__dirname, isDev ? 'routes/*.ts' : 'routes/*.js')],
 };
 
