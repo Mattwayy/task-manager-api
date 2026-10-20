@@ -68,7 +68,7 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     const result = await pool.query<Task>(
       `UPDATE tasks 
        SET title = COALESCE($1, title), 
-           description = CASE WHEN $2 IS NULL THEN description ELSE $2 END 
+           description = CASE WHEN $2::text IS NULL THEN description ELSE $2::text END, 
            status = COALESCE($3, status),
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $4 AND user_id = $5
