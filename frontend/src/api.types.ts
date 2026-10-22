@@ -219,9 +219,9 @@ export interface components {
         CreateTaskRequest: {
             title: string;
             /** @default  */
-            description: string;
+            description?: string;
             /** @default pending */
-            status: components["schemas"]["TaskStatus"];
+            status?: components["schemas"]["TaskStatus"];
         };
         UpdateTaskRequest: {
             title?: string;

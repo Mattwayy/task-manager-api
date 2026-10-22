@@ -14,7 +14,7 @@ export class ApiRequestError extends Error {
   }
 }
 
-const parseError = (error: unknown, fallback: TaskStatus): string => {
+const parseError = (error: unknown, fallback: string): string => {
   if (!error) return fallback;
   const err = error as ApiError;
   if (typeof err.error === 'string') return err.error;

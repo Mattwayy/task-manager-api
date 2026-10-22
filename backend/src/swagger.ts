@@ -1,6 +1,6 @@
-import swaggerJsdoc from 'swagger-jsdoc';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import swaggerJsdoc from "swagger-jsdoc";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -8,61 +8,61 @@ const ext = path.extname(fileURLToPath(import.meta.url));
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Task Manager API',
-      version: '1.0.0',
-      description: 'REST API for task management with JWT authentication',
+      title: "Task Manager API",
+      version: "1.0.0",
+      description: "REST API for task management with JWT authentication",
     },
     servers: [
       {
-        url: 'http://localhost:3000',
-        description: 'Development server',
+        url: "http://localhost:3000",
+        description: "Development server",
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
         },
       },
       schemas: {
         User: {
-          type: 'object',
+          type: "object",
           properties: {
-            id: { type: 'integer' },
-            username: { type: 'string' },
-            email: { type: 'string' },
-            created_at: { type: 'string', format: 'date-time' },
+            id: { type: "integer" },
+            username: { type: "string" },
+            email: { type: "string" },
+            created_at: { type: "string", format: "date-time" },
           },
         },
         Task: {
-          type: 'object',
+          type: "object",
           properties: {
-            id: { type: 'integer' },
-            title: { type: 'string' },
-            description: { type: 'string' },
+            id: { type: "integer" },
+            title: { type: "string" },
+            description: { type: "string" },
             status: {
-              type: 'string',
-              enum: ['pending', 'in_progress', 'completed'],
+              type: "string",
+              enum: ["pending", "in_progress", "completed"],
             },
-            user_id: { type: 'integer' },
-            created_at: { type: 'string', format: 'date-time' },
-            updated_at: { type: 'string', format: 'date-time' },
+            user_id: { type: "integer" },
+            created_at: { type: "string", format: "date-time" },
+            updated_at: { type: "string", format: "date-time" },
           },
         },
         ValidationError: {
-          type: 'object',
+          type: "object",
           properties: {
             errors: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'object',
+                type: "object",
                 properties: {
-                  field: { type: 'string' },
-                  message: { type: 'string' },
+                  field: { type: "string" },
+                  message: { type: "string" },
                 },
               },
             },
@@ -72,7 +72,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-    apis: [path.join(__dirname, `routes/*${ext}`)],
+  apis: [path.join(__dirname, `routes/*${ext}`)],
 };
 
 export default swaggerJsdoc(options);
