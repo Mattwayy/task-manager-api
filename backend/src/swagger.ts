@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const isDev = process.env.NODE_ENV === 'development';
+const ext = path.extname(fileURLToPath(import.meta.url));
 
 const options = {
   definition: {
@@ -72,7 +72,7 @@ const options = {
     },
     security: [{ bearerAuth: [] }],
   },
-  apis: [path.join(__dirname, isDev ? 'routes/*.ts' : 'routes/*.js')],
+    apis: [path.join(__dirname, `routes/*${ext}`)],
 };
 
 export default swaggerJsdoc(options);

@@ -5,6 +5,7 @@ import swaggerSpec from './swagger.js';
 import authRoutes from './routes/authRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import authMiddleware from './middleware/auth.js';
+import pool from './db.js';
 
 const app = express();
 

@@ -68,14 +68,13 @@ export const updateTask = async (req: Request, res: Response): Promise<void> => 
     const result = await pool.query<Task>(
       `UPDATE tasks 
        SET title = COALESCE($1, title), 
-           description = CASE WHEN $2::text IS NULL THEN description ELSE $2::text END, 
+           description = COALESCE($2, description), 
            status = COALESCE($3, status),
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $4 AND user_id = $5
        RETURNING *`,
       [title, description, status, id, userId]
     );
-
     if (result.rowCount === 0) {
       res.status(404).json({ error: 'Task not found' });
       return;
